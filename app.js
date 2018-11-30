@@ -2,6 +2,7 @@ const figlet = require('figlet')
 const clear = require('clear')
 const chalk = require('chalk')
 const eosjs = require('eosjs')
+const crypto = require('crypto')
 const { ecc } = eosjs.modules
 
 // clear()
@@ -43,7 +44,7 @@ const { ecc } = eosjs.modules
 //  Generate a random mnemonic (uses crypto.randomBytes under the hood), defaults to 128-bits of entropy
 //  strength = 256 for 24 words, 128 for 12
 //  derives the master, owner & active private and public keys of mnemonic
-// eos.generateMnemonic()
+// eosjs.generateMnemonic()
 // eos.deriveFromMnemonic(eos.generateMnemonic(128))
 //  seed: 'string' any length string. This is private. The same seed produces the same
 //  private key every time. At least 128 random bits should be used to produce a good private key.
@@ -117,6 +118,17 @@ const edgytesty311PrivateKey = '5JVjaFdWPtAdeWQBSAvh31R5HMnq2Qj7fbHdroQiSjCHrk4K
 const eos = eosjs(config)
 
 const main = async () => {
+  let entropy = Buffer.from(crypto.randomBytes(32)).toString('hex')
+  const eosOwnerKey = ecc.seedPrivate(entropy)
+  const ownerPublicKey = ecc.privateToPublic(eosOwnerKey)
+
+  entropy = Buffer.from(crypto.randomBytes(32)).toString('hex')
+  const eosKey = ecc.seedPrivate(entropy)
+  const activePublicKey = ecc.privateToPublic(eosKey)
+  console.log({ eosOwnerKey, eosKey, ownerPublicKey, activePublicKey })
+  if (1) {
+    process.exit()
+  }
 
   // ///////////////////////////////////////////////////
   // Derive public key
@@ -259,6 +271,11 @@ const main = async () => {
       stake_net_quantity: '0.1000 EOS',
       stake_cpu_quantity: '0.1000 EOS',
       transfer: 0
+    })
+    tr.buyrambytes({
+      payer: 'eosio',
+      receiver: accountName,
+      bytes: 8192
     })
   },
   {
