@@ -15,25 +15,26 @@ const mnemonicTest2 =
   'favorite lunch excess must month original potato blame charge curtain display salute'
 
 // ----MAIN NET----
-// const config = {
-//   chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906', // main net
-//   // keyProvider: ['MY PRIVATE KEY'], //used globally for signing transactions
-//   keyProvider: ['5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3'],
-//   httpEndpoint: 'https://api.eosnewyork.io:443', // main net
-//   expireInSeconds: 60,
+const config = {
+  chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906', // main net
+  // keyProvider: ['MY PRIVATE KEY'], //used globally for signing transactions
+  keyProvider: ['5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3'],
+  httpEndpoint: 'https://api.eosnewyork.io:443', // main net
+  expireInSeconds: 60
+}
 //   sign: true, // sign the transaction with a private key. Leaving a transaction unsigned avoids the need to provide a private key
 //   broadcast: true, // post the transaction to the blockchain. Use false to obtain a fully signed transaction
 //   verbose: false // verbose logging such as API activity
 // }
 
 // ----TEST NET----
-const config = {
-  // keyProvider: ['MY PRIVATE KEY'], //used globally for signing transactions
-  keyProvider: ['5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3'],
-  // sign: true,  // sign the transaction with a private key. Leaving a transaction unsigned avoids the need to provide a private key
-  // broadcast: true,  //post the transaction to the blockchain. Use false to obtain a fully signed transaction
-  verbose: false // verbose logging such as API activity
-}
+// const config = {
+//   // keyProvider: ['MY PRIVATE KEY'], //used globally for signing transactions
+//   keyProvider: ['5JVjaFdWPtAdeWQBSAvh31R5HMnq2Qj7fbHdroQiSjCHrk4KFCC'],
+//   // sign: true,  // sign the transaction with a private key. Leaving a transaction unsigned avoids the need to provide a private key
+//   // broadcast: true,  //post the transaction to the blockchain. Use false to obtain a fully signed transaction
+//   verbose: false // verbose logging such as API activity
+// }
 const eos = Eos(config)
 const { ecc } = Eos.modules
 
@@ -302,9 +303,11 @@ const _this = module.exports = {
             quantity: _this.toFloat(quantity),
             memo
           }
-        } else if (name === 'buyram') obj = { ...obj, payer, quant: _this.toFloat(quant), receiver }
-        else if (name === 'buyrambytes') obj = { ...obj, payer, receiver, bytes }
-        else if (name === 'delegatebw') {
+        } else if (name === 'buyram') {
+          obj = { ...obj, payer, quant: _this.toFloat(quant), receiver }
+        } else if (name === 'buyrambytes') {
+          obj = { ...obj, payer, receiver, bytes }
+        } else if (name === 'delegatebw') {
           obj = {
             ...obj,
             stake_cpu_quantity: _this.toFloat(stake_cpu_quantity), // unit in EOS

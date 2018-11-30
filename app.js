@@ -154,17 +154,33 @@ const main = async () => {
     }
   }
 
+  // See if account exists
+  async function getAccSystemStats (account) {
+    return new Promise((resolve, reject) => {
+      eos.getAccount(account, (error, result) => {
+        if (error) reject(error)
+        resolve(result.total_resources)
+      })
+    })
+  }
+  const accountStats = await getAccSystemStats('edgytesty311')
+  console.log(accountStats)
+
   // ///////////////////////////////////////////////////
   // Query account outgoing transactions
-  const actions = await eos.getActions('binancecleos')
+  const actions = await eos.getActions(accountName)
   console.log(actions)
 
   if (actions.actions && actions.actions.length > 0) {
     for (const action of actions.actions) {
+      const date = action.block_time
+      const blockNum = action.block_num
       const txid = action.action_trace.trx_id
       const name = action.action_trace.act.name
       console.log('------------------------------------------------')
       console.log(`Txid: ${txid}`)
+      console.log(`Data ${date}`)
+      console.log(`Block Number: ${blockNum}`)
       console.log(`Action type: ${name}`)
       if (name === 'transfer') {
         const { from, to, memo, quantity } = action.action_trace.act.data
@@ -195,7 +211,7 @@ const main = async () => {
         data: {
           from: accountName,
           to: destinationAccount,
-          quantity: '1.5000 SYS',
+          quantity: '1.5000 EOS',
           memo: ''
         }
       }
@@ -221,7 +237,7 @@ const main = async () => {
         data: {
           from: accountName,
           to: destinationAccount,
-          quantity: '1.5000 SYS',
+          quantity: '1.5000 EOS',
           memo: ''
         }
       }
@@ -233,6 +249,51 @@ const main = async () => {
     keyProvider: [edgytesty311PrivateKey]
   })
   console.log(signedTx)
+
+  // ///////////////////////////////////////////////////
+  // Buy CPU and RAM
+  const signedBuyBw = await eos.transaction(tr => {
+    tr.delegatebw({
+      from: accountName,
+      receiver: 'edgytestey43',
+      stake_net_quantity: '0.1000 EOS',
+      stake_cpu_quantity: '0.1000 EOS',
+      transfer: 0
+    })
+  },
+  {
+    sign: true,
+    broadcast: true,
+    keyProvider: [edgytesty311PrivateKey]
+  })
+  console.log(signedBuyBw)
+
+  // ///////////////////////////////////////////////////
+  // Create a signed transaction and broadcast
+  const signedTxForBroadcast = await eos.transaction({
+    actions: [
+      {
+        account: 'eosio.token',
+        name: 'transfer',
+        authorization: [{
+          actor: accountName,
+          permission: 'active'
+        }],
+        data: {
+          from: accountName,
+          to: destinationAccount,
+          quantity: '0.2100 EOS',
+          memo: ''
+        }
+      }
+    ]
+  },
+  {
+    sign: true,
+    broadcast: true,
+    keyProvider: [edgytesty311PrivateKey]
+  })
+  console.log(signedTxForBroadcast)
 }
 
 try {
